@@ -12,14 +12,14 @@
         android:id="@+id/item_list_color"
         android:layout_width="@dimen/size_list_image_width"
         android:layout_height="@dimen/size_list_image_height"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
         android:id="@+id/item_list_informations"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/text_margin"
         android:textStyle="bold"
@@ -32,7 +32,7 @@
 
     <TextView
         android:id="@+id/item_list_participants"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/text_margin"
         app:layout_constraintStart_toEndOf="@+id/item_list_color"

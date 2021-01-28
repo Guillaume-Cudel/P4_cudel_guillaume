@@ -9,6 +9,7 @@ import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
+import com.example.mareu.di.Di;
 import com.example.mareu.service.MeetingApiService;
 import com.example.mareu.ui.meeting_list.MeetingListActivity;
 import com.example.mareu.utils.DeleteViewAction;
@@ -43,6 +44,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -56,7 +58,7 @@ public class MeetingInstrumentedTest {
     @Rule
     public ActivityTestRule<MeetingListActivity> mActivityRule = new ActivityTestRule<>(MeetingListActivity.class);
     private MeetingListActivity mActivity;
-    private MeetingApiService mApiService;
+    private MeetingApiService service;
 
     public static Matcher<View> matchesDate(final int year, final int month, final int day) {
         return new BoundedMatcher<View, DatePicker>(DatePicker.class) {
@@ -77,6 +79,9 @@ public class MeetingInstrumentedTest {
     public void setUp() {
         mActivity = mActivityRule.getActivity();
         assertThat(mActivity, notNullValue());
+
+        service = Di.getNewInstanceApiService();
+        assertTrue(service.getMeetings().isEmpty());
     }
 
     // test du changement d'activité pour ajouter une réunion

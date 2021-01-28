@@ -32,7 +32,9 @@ import com.example.mareu.service.MeetingApiService;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -44,12 +46,13 @@ public class MeetingFragment extends Fragment {
     public static final String BUNDLE_EXTRA_COLOR = "extra_color";
     public static final String BUNDLE_EXTRA_LOCATION = "extra_location";
     public static final String BUNDLE_EXTRA_DATE = "extra_date";
+    public static final String BUNDLE_EXTRA_DATE_COMPARE = "extra_date_compare";
     public static final String BUNDLE_EXTRA_HOUR = "extra_hour";
     public static final String BUNDLE_EXTRA_SUBJECT = "extra_subject";
     public static final String BUNDLE_EXTRA_PARTICIPANTS = "extra_participants";
-
     public static final int REQUEST_MEETING = 1;
-    private MeetingApiService mApiservice;
+
+    private MeetingApiService mApiService;
     private List<Meeting> mMeetings;
     private RecyclerView mRecyclerView;
     private int selectedYear, selectedMonth, selectedDayOfMonth;
@@ -64,7 +67,7 @@ public class MeetingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mApiservice = Di.getNewInstanceApiService();
+        mApiService = Di.getNewInstanceApiService();
         setHasOptionsMenu(true);
 
         final Calendar c = Calendar.getInstance();
@@ -76,12 +79,13 @@ public class MeetingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_meeting_list, container, false);
-        Context context = view.getContext();
-        mRecyclerView = (RecyclerView) view;
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
-        return view;
+
+            View view = inflater.inflate(R.layout.fragment_meeting_list, container, false);
+            Context context = view.getContext();
+            mRecyclerView = (RecyclerView) view;
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+            mRecyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+            return view;
 
     }
 
@@ -120,7 +124,12 @@ public class MeetingFragment extends Fragment {
                             DatePickerDialog datePickerDialog = new DatePickerDialog(requireActivity(), new DatePickerDialog.OnDateSetListener() {
                                 @Override
                                 public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                    mEditDate.setText(dayOfMonth + "-" + month + "-" + year);
+                                    Calendar selectedDate = Calendar.getInstance();
+                                    selectedDate.set(year, month, dayOfMonth);
+                                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+                                    String formatedDate = formatter.format(selectedDate.getTime());
+                                    mEditDate.setText(formatedDate);
+                                   // mEditDate.setText(dayOfMonth + "-" + month + "-" + year);
                                 }
                             }, selectedYear, selectedMonth, selectedDayOfMonth);
                             datePickerDialog.show();
@@ -134,7 +143,7 @@ public class MeetingFragment extends Fragment {
                         List<Meeting> mFilterMeetings;
                         String roomChoosed = mSpinnerLocation.getSelectedItem().toString();
                         String dateOfEditDate = mEditDate.getText().toString();
-                        mFilterMeetings = mApiservice.getMeetingsByDateAndRoom(dateOfEditDate, roomChoosed);
+                        mFilterMeetings = mApiService.getMeetingsByDateAndRoom(dateOfEditDate, roomChoosed);
 
                         mRecyclerView.setAdapter(new MyMeetingRecyclerViewAdapter(mFilterMeetings));
                         dialog.cancel();
@@ -158,7 +167,7 @@ public class MeetingFragment extends Fragment {
     }
 
     public void initList() {
-        mMeetings = mApiservice.getMeetings();
+        mMeetings = mApiService.getMeetings();
         mRecyclerView.setAdapter(new MyMeetingRecyclerViewAdapter(mMeetings));
     }
 
@@ -183,14 +192,9 @@ public class MeetingFragment extends Fragment {
 
     @Subscribe
     public void onDeleteMeeting(DeleteMeetingEvent event) {
-        mApiservice.deleteMeeting(event.meeting);
+        mApiService.deleteMeeting(event.meeting);
         initList();
     }
-   /* @OnClick(R.id.add_meeting)
-    void addMeeting () {
-        Intent secondeActivite = new Intent(getActivity(), AddMeetingActivity.class);
-        startActivityForResult(secondeActivite, REQUEST_MEETING);
-    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -200,18 +204,15 @@ public class MeetingFragment extends Fragment {
             int color = data.getExtras().getInt(BUNDLE_EXTRA_COLOR);
             String location = data.getExtras().getString(BUNDLE_EXTRA_LOCATION);
             String date = data.getExtras().getString(BUNDLE_EXTRA_DATE);
+            Date dateCompare = (Date)data.getSerializableExtra(BUNDLE_EXTRA_DATE_COMPARE);
             String hour = data.getExtras().getString(BUNDLE_EXTRA_HOUR);
             String subject = data.getExtras().getString(BUNDLE_EXTRA_SUBJECT);
             String participants = data.getExtras().getString(BUNDLE_EXTRA_PARTICIPANTS);
-            Meeting meeting = new Meeting(id, color, location, date, hour, subject, participants);
 
-            mApiservice.createMeeting(meeting);
-            // initList();
+            Meeting meeting = new Meeting(id, color, location, date, hour, subject, participants, dateCompare);
 
-
+            mApiService.createMeeting(meeting);
         }
     }
-
-
 }
 

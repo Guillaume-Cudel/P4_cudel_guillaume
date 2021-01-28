@@ -14,11 +14,12 @@
         android:paddingBottom="100dp"
         tools:context=".ui.meeting_list.AddMeetingActivity">
 
+
         <ImageButton
             android:id="@+id/add_color"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/ic_lens"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +30,7 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/add_color" />
@@ -39,7 +40,7 @@
             android:layout_width="240dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spinner_location" />
@@ -57,7 +58,7 @@
             android:layout_width="240dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/select_date" />
@@ -73,29 +74,63 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/add_subject"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginTop="30dp"
             android:hint="Subject"
+            android:maxLength="25"
             android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@id/select_hour"
             app:layout_constraintTop_toBottomOf="@+id/select_hour" />
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_add_participants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:hint="Participants to adding"
+            app:boxBackgroundColor="@color/design_default_color_backgroundy"
+            app:hintAnimationEnabled="false"
+            android:inputType="textEmailAddress"
+            app:counterMaxLength="15"
+            app:layout_constraintStart_toStartOf="@id/add_subject"
+            app:layout_constraintTop_toBottomOf="@+id/add_subject">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/add_participants"
-            android:layout_width="match_parent"
+            android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="30dp"
-            android:hint="Participants"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:enabled="true"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/button_participants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/input_layout_add_participants"
+            app:layout_constraintStart_toEndOf="@id/input_layout_add_participants"
+            android:text="Add"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_input_layout_participants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/input_layout_add_participants"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/add_subject" />
+            app:boxBackgroundColor="@color/design_default_color_backgroundy"
+            android:hint="Participants"
+            app:hintAnimationEnabled="false"
+            android:layout_marginEnd="30dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="30dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/participants"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:enabled="true"/>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/add_save"
@@ -110,7 +145,8 @@
             app:cornerRadius="100dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/add_participants" />
+            app:layout_constraintTop_toBottomOf="@+id/text_input_layout_participants" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

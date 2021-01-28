@@ -1,5 +1,6 @@
 package com.example.mareu.model;
 
+import java.util.Date;
 import java.util.Objects;
 
 public class Meeting {
@@ -11,9 +12,10 @@ public class Meeting {
     private String hour;
     private String subject;
     private String participants;
+    private Date dateToCompare;
 
 
-    public Meeting(long id, int color, String location, String date, String hour, String subject, String participants) {
+    public Meeting(long id, int color, String location, String date, String hour, String subject, String participants, Date dateToCompare) {
         this.id = id;
         this.color = color;
         this.location = location;
@@ -21,6 +23,8 @@ public class Meeting {
         this.hour = hour;
         this.subject = subject;
         this.participants = participants;
+        this.dateToCompare = dateToCompare;
+        
     }
 
     public long getId() {
@@ -79,18 +83,12 @@ public class Meeting {
         this.participants = participants;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Meeting meeting = (Meeting) o;
-        return Objects.equals(id, meeting.id);
+    public Date toDate(){ return dateToCompare;}
+
+    public void setDateToCompare(Date dateToCompare){
+        this.dateToCompare = dateToCompare;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }
 
 

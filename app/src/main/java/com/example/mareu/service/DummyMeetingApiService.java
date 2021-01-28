@@ -3,6 +3,8 @@ package com.example.mareu.service;
 import com.example.mareu.model.Meeting;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class DummyMeetingApiService implements MeetingApiService {
@@ -40,7 +42,59 @@ public class DummyMeetingApiService implements MeetingApiService {
         }
         return filterMeetings;
     }
+
+    @Override
+    public String pad(int input){
+        String str = "";
+        if (input >= 10){
+            str = Integer.toString(input);
+        } else {
+            str = "0" + Integer.toString(input);
+        }
+        return str;
+    }
+
+
+    @Override
+    public boolean verifyIfIsNotPossible(String verifyRoom, Date verifyDate) {
+        for (Meeting m : meetings) {
+            if (m.getLocation().equals(verifyRoom)) {
+                // heure de début d'une réunion existante
+                Date startOldDate = m.toDate();
+                // heure de fin de l'ancienne réunion (heure de début + 1h)
+                Calendar endOldCalendar = Calendar.getInstance();
+                endOldCalendar.setTime(startOldDate);
+                endOldCalendar.add(Calendar.HOUR_OF_DAY, 1);
+                Date endOldDate = endOldCalendar.getTime();
+                // heure de fin de la nouvelle réunion (heure +1)
+                Calendar endNewCalendar = Calendar.getInstance();
+                endNewCalendar.setTime(verifyDate);
+                endNewCalendar.add(Calendar.HOUR_OF_DAY, 1);
+                Date endNewDate = endNewCalendar.getTime();
+
+                if (startOldDate.before(verifyDate)) {
+                    if (endOldDate.equals(verifyDate) || endOldDate.before(verifyDate)) {
+                        return false;
+                    }
+                } else if(startOldDate.after(verifyDate)) {
+                    if (endNewDate.equals(startOldDate) || endNewDate.before(startOldDate)) {
+                        return false;
+                    }
+                }else
+                       return true;
+            }
+        }
+        return false;
+    }
+
+    /*  if (verifyDate.after(startOldDate) && verifyDate.before(endOldDate)) {
+                    return true;
+                }
+                if (m.toDate().equals(verifyDate)) {
+                    return true;
+                }*/
 }
+
 
 
 

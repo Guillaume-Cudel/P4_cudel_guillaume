@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -38,20 +39,25 @@ public class MeetingUnitTest {
 
     @Test
     public void addMeetingWithSuccess() {
+        assertTrue(service.getMeetings().isEmpty());
         Meeting meetingAdded = new Meeting(1, 1, "Loin", "10/10/20",
-                "01h00", "Aquaponey", "Pleins de mamies");
+                "01h00", "Aquagym", "Pleins de mamies");
         service.createMeeting(meetingAdded);
-        Meeting controlMeeting2 = service.getMeetings().get(0);
-        assertTrue(service.getMeetings().contains(controlMeeting2));
+        assertEquals(1, service.getMeetings().size());
+        assertTrue(service.getMeetings().contains(meetingAdded));
     }
 
     @Test
     public void deleteMeetingWithSuccess() {
+        assertTrue(service.getMeetings().isEmpty());
         Meeting meetingAdded = new Meeting(1, 1, "Loin", "10/10/20",
-                "01h00", "Aquaponey", "Pleins de mamies");
+                "01h00", "Chaussures", "Pleins de clients");
         service.createMeeting(meetingAdded);
-        Meeting meetingToDelete = service.getMeetings().get(0);
-        service.deleteMeeting(meetingToDelete);
-        assertFalse(service.getMeetings().contains(meetingToDelete));
+        assertEquals(1, service.getMeetings().size());
+        service.deleteMeeting(meetingAdded);
+        assertFalse(service.getMeetings().contains(meetingAdded));
+        assertTrue(service.getMeetings().isEmpty());
     }
+
+    // TODO ajouter test sur méthode de controle de date et salle
 }

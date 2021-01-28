@@ -1,10 +1,16 @@
 package com.example.mareu.ui.meeting_list;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,12 +19,16 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -27,8 +37,22 @@ import com.example.mareu.di.Di;
 import com.example.mareu.service.MeetingApiService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
+import org.joda.time.DateTime;
+
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 import butterknife.BindView;
@@ -37,6 +61,7 @@ import butterknife.OnClick;
 
 import static com.example.mareu.ui.meeting_list.MeetingFragment.BUNDLE_EXTRA_COLOR;
 import static com.example.mareu.ui.meeting_list.MeetingFragment.BUNDLE_EXTRA_DATE;
+import static com.example.mareu.ui.meeting_list.MeetingFragment.BUNDLE_EXTRA_DATE_COMPARE;
 import static com.example.mareu.ui.meeting_list.MeetingFragment.BUNDLE_EXTRA_HOUR;
 import static com.example.mareu.ui.meeting_list.MeetingFragment.BUNDLE_EXTRA_ID;
 import static com.example.mareu.ui.meeting_list.MeetingFragment.BUNDLE_EXTRA_LOCATION;
@@ -46,84 +71,184 @@ import static com.example.mareu.ui.meeting_list.MeetingFragment.BUNDLE_EXTRA_SUB
 
 public class AddMeetingActivity extends AppCompatActivity implements View.OnClickListener {
 
-    @BindView(R.id.add_color)
-    ImageView mAddColor;
-    @BindView(R.id.spinner_location)
-    Spinner mSpinnerLocation;
-    @BindView(R.id.select_date)
-    EditText mSelectDate;
-    @BindView(R.id.button_date)
-    Button mButtonDate;
-    @BindView(R.id.select_hour)
-    EditText mSelectHour;
-    @BindView(R.id.button_hour)
-    Button mButtonHour;
-    @BindView(R.id.add_subject)
-    TextInputEditText mAddSubject;
-    @BindView(R.id.add_participants)
-    TextInputEditText mAddParticipants;
-    @BindView(R.id.add_save)
-    MaterialButton mSave;
+    private TextInputEditText mAddParticipants, mParticipants, mSubjectText;
+    private Button mButtonAddParticipantsWithMail, mDateButton, mHourButton;
+    private ImageButton mButtonColor;
+    private Spinner mSpinnerLocation;
+    private EditText mDateText, mHourText;
+    private MaterialButton mSave;
 
     private MeetingApiService mApiService;
     private int mMeetingColor = 0;
+    private int mYear;
+    private int mMonth;
+    private int mDay;
+    private int mHour;
+    private int mMinute;
+    private int colorChoosed;
+    private int spinnerRoom;
     private String[] room = {"Room A", "Room B", "Room C", "Room D", "Room E", "Room F", "Room G", "Room H", "Room I", "Room J"};
+    private final int subjectMaxLenght = 25, participantMaxLenght = 15;
+    private Date  dateToCompare;
+    private String formatedDate, roomChoosed, subjectChoosed, participantsChoosed, dateChoosed, hourChoosed, dateAndHourChoosed;
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_meeting);
-        ButterKnife.bind(this);
-
+        mApiService = Di.getNewInstanceApiService();
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mButtonDate.setOnClickListener(this);
-        mButtonHour.setOnClickListener(this);
+        mAddParticipants = findViewById(R.id.add_participants);
+        mParticipants = findViewById(R.id.participants);
+        mButtonAddParticipantsWithMail = findViewById(R.id.button_participants);
+        mButtonColor = findViewById(R.id.add_color);
+        mSpinnerLocation = findViewById(R.id.spinner_location);
+        mDateText = findViewById(R.id.select_date);
+        mHourText = findViewById(R.id.select_hour);
+        mDateButton = findViewById(R.id.button_date);
+        mHourButton = findViewById(R.id.button_hour);
+        mSubjectText = findViewById(R.id.add_subject);
+        mSave = findViewById(R.id.add_save);
+
+        mAddParticipants.setFilters(new InputFilter[]{new InputFilter.LengthFilter(participantMaxLenght)});
+        mSubjectText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(subjectMaxLenght)});
+
+        mDateText.setOnClickListener(this);
+        mHourText.setOnClickListener(this);
+        mSubjectText.setOnClickListener(this);
+        mSave.setOnClickListener(this);
+        mDateButton.setOnClickListener(this);
+        mHourButton.setOnClickListener(this);
+        mButtonColor.setOnClickListener(this);
+        mButtonAddParticipantsWithMail.setOnClickListener(this);
 
         ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, room);
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerLocation.setAdapter(adapter1);
 
-
-        mApiService = Di.getNewInstanceApiService();
         init();
     }
 
-
     @Override
     public void onClick(View v) {
-        if (v == mButtonDate) {
-            final Calendar c = Calendar.getInstance();
-            int mYear = c.get(Calendar.YEAR);
-            int mMonth = c.get(Calendar.MONTH);
-            int mDay = c.get(Calendar.DAY_OF_MONTH);
+        int id = v.getId();
 
-            DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                    mSelectDate.setText(dayOfMonth + "-" + month + "-" + year);
-                }
-            }, mYear, mMonth, mDay);
-            datePickerDialog.show();
-        }
-        if (v == mButtonHour) {
-            final Calendar c = Calendar.getInstance();
-            int mHour = c.get(Calendar.HOUR_OF_DAY);
-            int mMinute = c.get(Calendar.MINUTE);
+        final Calendar c = Calendar.getInstance();
+         mYear = c.get(Calendar.YEAR);
+         mMonth = c.get(Calendar.MONTH);
+         mDay = c.get(Calendar.DAY_OF_MONTH);
+         mHour = c.get(Calendar.HOUR_OF_DAY);
+         mMinute = c.get(Calendar.MINUTE);
+        switch (id) {
+            case R.id.button_date :
 
-            TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
-                @Override
-                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                    mSelectHour.setText(hourOfDay + ":" + minute);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        Calendar selectedDate = Calendar.getInstance();
+                        selectedDate.set(year, month, dayOfMonth);
+                        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                        formatedDate = formatter.format(selectedDate.getTime());
+                        mDateText.setText(formatedDate);
+                    }
+                }, mYear, mMonth, mDay);
+
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                datePickerDialog.show();
+                break;
+
+            case R.id.button_hour:
+
+                TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        mHourText.setText(mApiService.pad(hourOfDay) + ":" + mApiService.pad(minute));
                 }
             }, mHour, mMinute, true);
+
             timePickerDialog.show();
+            break;
+
+            case R.id.button_participants:
+                if (mAddParticipants != null) {
+                    String participantsSaved = mAddParticipants.getEditableText().toString();
+                    mParticipants.setText(mParticipants.getText().toString()+ participantsSaved + "@meeting.com; ");
+                    mAddParticipants.getEditableText().clear();
+                }
+                break;
+
+            case R.id.add_color:
+                if (mMeetingColor >= 4) {
+                    mMeetingColor = 0;
+                    changeColor(mMeetingColor);
+                } else {
+                    mMeetingColor++;
+                    changeColor(mMeetingColor);
+                }
+                break;
+
+            case R.id.add_save:
+
+                long idChoosed = System.currentTimeMillis();
+                colorChoosed = mMeetingColor;
+                roomChoosed = mSpinnerLocation.getSelectedItem().toString();
+                spinnerRoom = mSpinnerLocation.getSelectedItemPosition();
+                dateChoosed = mDateText.getEditableText().toString();
+                hourChoosed = mHourText.getEditableText().toString();
+                dateAndHourChoosed = dateChoosed + " " + hourChoosed;
+                subjectChoosed = mSubjectText.getEditableText().toString();
+                participantsChoosed = mParticipants.getText().toString();
+
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/mm/yyyy hh:mm");
+                try {
+                     dateToCompare = sdf.parse(dateAndHourChoosed);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (mApiService.verifyIfIsNotPossible(roomChoosed, dateToCompare)) {
+                    AlertDialog.Builder buildeMeetingError;
+                    buildeMeetingError = new AlertDialog.Builder(this);
+                    buildeMeetingError.setTitle("Error to adding the meeting !");
+                    buildeMeetingError.setMessage("There is already a meeting in this room at this time. Please choose an other room or an other time ");
+                    buildeMeetingError.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+
+                    AlertDialog dialogMeetingError = buildeMeetingError.create();
+                    dialogMeetingError.show();
+                } else {
+                    saveMeeting(idChoosed);
+
+                }
+                break;
         }
     }
 
+    private void saveMeeting(long idChoosed) {
+        Intent intent = getIntent();
+        intent.putExtra(BUNDLE_EXTRA_ID, idChoosed);
+        intent.putExtra(BUNDLE_EXTRA_COLOR, colorChoosed);
+        intent.putExtra(BUNDLE_EXTRA_LOCATION, roomChoosed);
+        intent.putExtra(BUNDLE_EXTRA_DATE, dateChoosed);
+        intent.putExtra(BUNDLE_EXTRA_DATE_COMPARE, dateToCompare);
+        intent.putExtra(BUNDLE_EXTRA_HOUR, hourChoosed);
+        intent.putExtra(BUNDLE_EXTRA_SUBJECT, subjectChoosed);
+        intent.putExtra(BUNDLE_EXTRA_PARTICIPANTS, participantsChoosed);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -140,8 +265,8 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
 
     private void init() {
         changeColor(mMeetingColor);
-        Glide.with(this).load(mMeetingColor).apply(RequestOptions.circleCropTransform()).into(mAddColor);
-        mSelectDate.addTextChangedListener(new TextWatcher() {
+        Glide.with(this).load(mMeetingColor).apply(RequestOptions.circleCropTransform()).into(mButtonColor);
+        mDateText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -155,12 +280,56 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
                 mSave.setEnabled(s.length() > 0);
             }
         });
+
+        mAddParticipants.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {mButtonAddParticipantsWithMail.setEnabled(s.length() > 2);}
+        });
+    }
+
+    public void changeColor(int color) {
+        mMeetingColor = color;
+        if (color == 1) {
+            mButtonColor.setImageResource(R.drawable.ic_lens_cyan);
+        } else if (color == 2) {
+            mButtonColor.setImageResource(R.drawable.ic_lens_green);
+        } else if (color == 3) {
+            mButtonColor.setImageResource(R.drawable.ic_lens_red);
+        } else if (color == 4) {
+            mButtonColor.setImageResource(R.drawable.ic_lens_pink);
+        } else if (color == 0) {
+            mButtonColor.setImageResource(R.drawable.ic_lens);
+        }
     }
 
 
-    @OnClick(R.id.add_color)
+
+
+
+    // -----------------------------
+    // ANCIEN CODE
+    // -----------------------------
+
+    /*@OnClick(R.id.add_color)
     void onClickChangeColor() {
-        changeColor(new Random().nextInt(5));
+        if (mMeetingColor >= 4 ) {
+            mMeetingColor = 0;
+            changeColor(mMeetingColor);
+        } else {
+            mMeetingColor++;
+            changeColor(mMeetingColor);
+        }
+       // changeColor(new Random().nextInt(5));
     }
 
     @OnClick(R.id.add_save)
@@ -170,10 +339,10 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
         long idChoosed = System.currentTimeMillis();
         int colorChoosed = mMeetingColor;
         String roomChoosed = mSpinnerLocation.getSelectedItem().toString();
-        String dateChoosed = mSelectDate.getEditableText().toString();
-        String hourChoosed = mSelectHour.getEditableText().toString();
-        String subjectChoosed = mAddSubject.getEditableText().toString();
-        String participantsChoosed = mAddParticipants.getEditableText().toString();
+        String dateChoosed = mDateText.getEditableText().toString();
+        String hourChoosed = mHourText.getEditableText().toString();
+        String subjectChoosed = mSubjectText.getEditableText().toString();
+        String participantsChoosed = mParticipants.getText().toString();
 
         intent.putExtra(BUNDLE_EXTRA_ID, idChoosed);
         intent.putExtra(BUNDLE_EXTRA_COLOR, colorChoosed);
@@ -182,27 +351,94 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
         intent.putExtra(BUNDLE_EXTRA_HOUR, hourChoosed);
         intent.putExtra(BUNDLE_EXTRA_SUBJECT, subjectChoosed);
         intent.putExtra(BUNDLE_EXTRA_PARTICIPANTS, participantsChoosed);
-
-
         setResult(RESULT_OK, intent);
         finish();
-    }
+    }*/
 
+    /* @Override
+    public void onClick(View v) {
+        if (v == mDateButton) {
+            final Calendar c = Calendar.getInstance();
+            int mYear = c.get(Calendar.YEAR);
+            int mMonth = c.get(Calendar.MONTH);
+            int mDay = c.get(Calendar.DAY_OF_MONTH);
 
-    public void changeColor(int color) {
-        mMeetingColor = color;
-        if (color == 1) {
-            mAddColor.setImageResource(R.drawable.ic_lens_cyan);
-        } else if (color == 2) {
-            mAddColor.setImageResource(R.drawable.ic_lens_green);
-        } else if (color == 3) {
-            mAddColor.setImageResource(R.drawable.ic_lens_red);
-        } else if (color == 4) {
-            mAddColor.setImageResource(R.drawable.ic_lens_pink);
-        } else if (color == 0) {
-            mAddColor.setImageResource(R.drawable.ic_lens);
+            DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                    Calendar selectedDate = Calendar.getInstance();
+                    selectedDate.set(year, month, dayOfMonth);
+                   SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+                    String formatedDate = formatter.format(selectedDate.getTime());
+                    mDateText.setText(formatedDate);
+                }
+            }, mYear, mMonth, mDay);
+
+            datePickerDialog.show();
         }
-    }
+        if (v == mHourButton) {
+            final Calendar c = Calendar.getInstance();
+            int mHour = c.get(Calendar.HOUR_OF_DAY);
+            int mMinute = c.get(Calendar.MINUTE);
 
+            TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    // Changer le format des heures
+                  /*  Calendar selectedTime = Calendar.getInstance();
+                    selectedTime.set(hourOfDay, minute);
+                    String formatedTime = new SimpleDateFormat("HH:mm").format(selectedTime);
+                   SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
+                    String formatedTime = formatter.format(selectedTime.getTime());
+                    mSelectHour.setText(formatedTime);
+
+                    mHourText.setText(pad(hourOfDay) + ":" + pad(minute));
+
+                }
+            }, mHour, mMinute, true);
+
+            timePickerDialog.show();
+        }
+
+        if (v == mButtonAddParticipantsWithMail){
+           if (mAddParticipants != null) {
+               String participantsSaved = mAddParticipants.getEditableText().toString();
+               mParticipants.setText(mParticipants.getText().toString()+ participantsSaved + "@meeting.com; ");
+               mAddParticipants.getEditableText().clear();
+            }
+       }
+        if(v == mButtonColor){
+                if (mMeetingColor >= 4) {
+                    mMeetingColor = 0;
+                    changeColor(mMeetingColor);
+                } else {
+                    mMeetingColor++;
+                    changeColor(mMeetingColor);
+                }
+            }
+
+        if (v == mSave){
+            Intent intent = getIntent();
+
+            long idChoosed = System.currentTimeMillis();
+            int colorChoosed = mMeetingColor;
+            String roomChoosed = mSpinnerLocation.getSelectedItem().toString();
+            String dateChoosed = mDateText.getEditableText().toString();
+            String hourChoosed = mHourText.getEditableText().toString();
+            String subjectChoosed = mSubjectText.getEditableText().toString();
+            String participantsChoosed = mParticipants.getText().toString();
+
+            intent.putExtra(BUNDLE_EXTRA_ID, idChoosed);
+            intent.putExtra(BUNDLE_EXTRA_COLOR, colorChoosed);
+            intent.putExtra(BUNDLE_EXTRA_LOCATION, roomChoosed);
+            intent.putExtra(BUNDLE_EXTRA_DATE, dateChoosed);
+            intent.putExtra(BUNDLE_EXTRA_HOUR, hourChoosed);
+            intent.putExtra(BUNDLE_EXTRA_SUBJECT, subjectChoosed);
+            intent.putExtra(BUNDLE_EXTRA_PARTICIPANTS, participantsChoosed);
+            setResult(RESULT_OK, intent);
+            finish();
+
+        }
+    }*/
 
 }

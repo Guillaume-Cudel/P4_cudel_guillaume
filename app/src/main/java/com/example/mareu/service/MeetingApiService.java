@@ -2,6 +2,7 @@ package com.example.mareu.service;
 
 import com.example.mareu.model.Meeting;
 
+import java.util.Date;
 import java.util.List;
 
 public interface MeetingApiService {
@@ -14,5 +15,8 @@ public interface MeetingApiService {
 
     List<Meeting> getMeetingsByDateAndRoom(String date, String room);
 
+    String pad(int input);
+
+    boolean verifyIfIsNotPossible(String room, Date dateToCompare);
 
 }

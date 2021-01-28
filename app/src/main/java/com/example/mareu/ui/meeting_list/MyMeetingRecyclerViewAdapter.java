@@ -59,7 +59,7 @@ public class MyMeetingRecyclerViewAdapter extends RecyclerView.Adapter<MyMeeting
         String date = meeting.getDate();
         String hour = meeting.getHour();
         String subject = meeting.getSubject();
-        String informations = location + " - " + date + " at " + hour + " - " + subject;
+        String informations = location + " - " + date + " at " + hour + "   " + subject;
         holder.mMeetingInformations.setText(informations);
         holder.mMeetingParticipants.setText(meeting.getParticipants());
         Glide.with(holder.mMeetingColor.getContext())
@@ -76,25 +76,35 @@ public class MyMeetingRecyclerViewAdapter extends RecyclerView.Adapter<MyMeeting
 
     }
 
-
     @Override
     public int getItemCount() {
         return mMeetings.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.item_list_color)
+       /* @BindView(R.id.item_list_color)
         public ImageView mMeetingColor;
         @BindView(R.id.item_list_informations)
         public TextView mMeetingInformations;
         @BindView(R.id.item_list_participants)
         public TextView mMeetingParticipants;
         @BindView(R.id.item_list_delete_button)
-        public ImageButton mDeleteButton;
+        public ImageButton mDeleteButton;*/
+
+        ImageView mMeetingColor;
+        TextView mMeetingInformations;
+        TextView mMeetingParticipants;
+        ImageButton mDeleteButton;
 
         public ViewHolder(View view) {
             super(view);
-            ButterKnife.bind(this, view);
+            //ButterKnife.bind(this, view);
+
+            mMeetingColor = (ImageView) view.findViewById(R.id.item_list_color);
+            mMeetingInformations = (TextView) view.findViewById(R.id.item_list_informations);
+            mMeetingParticipants = (TextView) view.findViewById(R.id.item_list_participants);
+            mDeleteButton = (ImageButton) view.findViewById(R.id.item_list_delete_button);
+
         }
 
     }
