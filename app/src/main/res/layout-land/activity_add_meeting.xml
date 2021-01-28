@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/add_meeting_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.meeting_list.AddMeetingActivity">
+    android:fillViewport="true">
+
+
+ <androidx.constraintlayout.widget.ConstraintLayout
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:paddingBottom="100dp"
+     tools:context=".ui.meeting_list.AddMeetingActivity">
 
     <ImageButton
         android:id="@+id/add_color"
@@ -116,7 +125,7 @@
         app:boxBackgroundColor="@color/design_default_color_backgroundy"
         android:hint="Participants"
         app:hintAnimationEnabled="false"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="5dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/participants"
@@ -145,3 +154,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

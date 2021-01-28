@@ -34,6 +34,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.mareu.R;
 import com.example.mareu.di.Di;
+import com.example.mareu.model.Meeting;
 import com.example.mareu.service.MeetingApiService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -53,6 +54,7 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import butterknife.BindView;
@@ -91,9 +93,6 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
     private final int subjectMaxLenght = 25, participantMaxLenght = 15;
     private Date  dateToCompare;
     private String formatedDate, roomChoosed, subjectChoosed, participantsChoosed, dateChoosed, hourChoosed, dateAndHourChoosed;
-
-
-
 
 
 
@@ -215,7 +214,7 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
                     e.printStackTrace();
                 }
 
-                if (mApiService.verifyIfIsNotPossible(roomChoosed, dateToCompare)) {
+                /*if (mApiService.verifyIfIsNotPossible(roomChoosed, dateToCompare)) {
                     AlertDialog.Builder buildeMeetingError;
                     buildeMeetingError = new AlertDialog.Builder(this);
                     buildeMeetingError.setTitle("Error to adding the meeting !");
@@ -230,8 +229,8 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
                     dialogMeetingError.show();
                 } else {
                     saveMeeting(idChoosed);
-
-                }
+                }*/
+                saveMeeting(idChoosed);
                 break;
         }
     }
@@ -312,133 +311,5 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-
-
-
-
-    // -----------------------------
-    // ANCIEN CODE
-    // -----------------------------
-
-    /*@OnClick(R.id.add_color)
-    void onClickChangeColor() {
-        if (mMeetingColor >= 4 ) {
-            mMeetingColor = 0;
-            changeColor(mMeetingColor);
-        } else {
-            mMeetingColor++;
-            changeColor(mMeetingColor);
-        }
-       // changeColor(new Random().nextInt(5));
-    }
-
-    @OnClick(R.id.add_save)
-    void addMeeting() {
-        Intent intent = getIntent();
-
-        long idChoosed = System.currentTimeMillis();
-        int colorChoosed = mMeetingColor;
-        String roomChoosed = mSpinnerLocation.getSelectedItem().toString();
-        String dateChoosed = mDateText.getEditableText().toString();
-        String hourChoosed = mHourText.getEditableText().toString();
-        String subjectChoosed = mSubjectText.getEditableText().toString();
-        String participantsChoosed = mParticipants.getText().toString();
-
-        intent.putExtra(BUNDLE_EXTRA_ID, idChoosed);
-        intent.putExtra(BUNDLE_EXTRA_COLOR, colorChoosed);
-        intent.putExtra(BUNDLE_EXTRA_LOCATION, roomChoosed);
-        intent.putExtra(BUNDLE_EXTRA_DATE, dateChoosed);
-        intent.putExtra(BUNDLE_EXTRA_HOUR, hourChoosed);
-        intent.putExtra(BUNDLE_EXTRA_SUBJECT, subjectChoosed);
-        intent.putExtra(BUNDLE_EXTRA_PARTICIPANTS, participantsChoosed);
-        setResult(RESULT_OK, intent);
-        finish();
-    }*/
-
-    /* @Override
-    public void onClick(View v) {
-        if (v == mDateButton) {
-            final Calendar c = Calendar.getInstance();
-            int mYear = c.get(Calendar.YEAR);
-            int mMonth = c.get(Calendar.MONTH);
-            int mDay = c.get(Calendar.DAY_OF_MONTH);
-
-            DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                    Calendar selectedDate = Calendar.getInstance();
-                    selectedDate.set(year, month, dayOfMonth);
-                   SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-                    String formatedDate = formatter.format(selectedDate.getTime());
-                    mDateText.setText(formatedDate);
-                }
-            }, mYear, mMonth, mDay);
-
-            datePickerDialog.show();
-        }
-        if (v == mHourButton) {
-            final Calendar c = Calendar.getInstance();
-            int mHour = c.get(Calendar.HOUR_OF_DAY);
-            int mMinute = c.get(Calendar.MINUTE);
-
-            TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
-                @Override
-                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                    // Changer le format des heures
-                  /*  Calendar selectedTime = Calendar.getInstance();
-                    selectedTime.set(hourOfDay, minute);
-                    String formatedTime = new SimpleDateFormat("HH:mm").format(selectedTime);
-                   SimpleDateFormat formatter = new SimpleDateFormat("hh:mm");
-                    String formatedTime = formatter.format(selectedTime.getTime());
-                    mSelectHour.setText(formatedTime);
-
-                    mHourText.setText(pad(hourOfDay) + ":" + pad(minute));
-
-                }
-            }, mHour, mMinute, true);
-
-            timePickerDialog.show();
-        }
-
-        if (v == mButtonAddParticipantsWithMail){
-           if (mAddParticipants != null) {
-               String participantsSaved = mAddParticipants.getEditableText().toString();
-               mParticipants.setText(mParticipants.getText().toString()+ participantsSaved + "@meeting.com; ");
-               mAddParticipants.getEditableText().clear();
-            }
-       }
-        if(v == mButtonColor){
-                if (mMeetingColor >= 4) {
-                    mMeetingColor = 0;
-                    changeColor(mMeetingColor);
-                } else {
-                    mMeetingColor++;
-                    changeColor(mMeetingColor);
-                }
-            }
-
-        if (v == mSave){
-            Intent intent = getIntent();
-
-            long idChoosed = System.currentTimeMillis();
-            int colorChoosed = mMeetingColor;
-            String roomChoosed = mSpinnerLocation.getSelectedItem().toString();
-            String dateChoosed = mDateText.getEditableText().toString();
-            String hourChoosed = mHourText.getEditableText().toString();
-            String subjectChoosed = mSubjectText.getEditableText().toString();
-            String participantsChoosed = mParticipants.getText().toString();
-
-            intent.putExtra(BUNDLE_EXTRA_ID, idChoosed);
-            intent.putExtra(BUNDLE_EXTRA_COLOR, colorChoosed);
-            intent.putExtra(BUNDLE_EXTRA_LOCATION, roomChoosed);
-            intent.putExtra(BUNDLE_EXTRA_DATE, dateChoosed);
-            intent.putExtra(BUNDLE_EXTRA_HOUR, hourChoosed);
-            intent.putExtra(BUNDLE_EXTRA_SUBJECT, subjectChoosed);
-            intent.putExtra(BUNDLE_EXTRA_PARTICIPANTS, participantsChoosed);
-            setResult(RESULT_OK, intent);
-            finish();
-
-        }
-    }*/
 
 }

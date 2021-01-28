@@ -61,18 +61,34 @@ public class DummyMeetingApiService implements MeetingApiService {
             if (m.getLocation().equals(verifyRoom)) {
                 // heure de début d'une réunion existante
                 Date startOldDate = m.toDate();
+
                 // heure de fin de l'ancienne réunion (heure de début + 1h)
                 Calendar endOldCalendar = Calendar.getInstance();
                 endOldCalendar.setTime(startOldDate);
                 endOldCalendar.add(Calendar.HOUR_OF_DAY, 1);
                 Date endOldDate = endOldCalendar.getTime();
+
                 // heure de fin de la nouvelle réunion (heure +1)
                 Calendar endNewCalendar = Calendar.getInstance();
                 endNewCalendar.setTime(verifyDate);
                 endNewCalendar.add(Calendar.HOUR_OF_DAY, 1);
                 Date endNewDate = endNewCalendar.getTime();
 
-                if (startOldDate.before(verifyDate)) {
+                if (verifyDate.after(startOldDate) && verifyDate.before(endOldDate)) {
+                    return true;
+                } else if (verifyDate.equals(endOldDate) || endNewDate.equals(startOldDate)) {
+                    return false;
+                }else if(verifyDate.before(startOldDate) && endNewDate.after(startOldDate)){
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+        }
+            return false;
+        }
+
+        /*  if (startOldDate.before(verifyDate)) {
                     if (endOldDate.equals(verifyDate) || endOldDate.before(verifyDate)) {
                         return false;
                     }
@@ -82,17 +98,7 @@ public class DummyMeetingApiService implements MeetingApiService {
                     }
                 }else
                        return true;
-            }
-        }
-        return false;
-    }
-
-    /*  if (verifyDate.after(startOldDate) && verifyDate.before(endOldDate)) {
-                    return true;
-                }
-                if (m.toDate().equals(verifyDate)) {
-                    return true;
-                }*/
+            }*/
 }
 
 
