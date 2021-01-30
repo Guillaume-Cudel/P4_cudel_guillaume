@@ -9,7 +9,7 @@ import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
-import com.example.mareu.di.Di;
+import com.example.mareu.di.DI;
 import com.example.mareu.service.MeetingApiService;
 import com.example.mareu.ui.meeting_list.MeetingListActivity;
 import com.example.mareu.utils.DeleteViewAction;
@@ -80,7 +80,7 @@ public class MeetingInstrumentedTest {
         mActivity = mActivityRule.getActivity();
         assertThat(mActivity, notNullValue());
 
-        service = Di.getNewInstanceApiService();
+        service = DI.getNewInstanceApiService();
         assertTrue(service.getMeetings().isEmpty());
     }
 

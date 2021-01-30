@@ -1,16 +1,11 @@
 package com.example.mareu.ui.meeting_list;
 
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
-import android.text.InputType;
-import android.text.Spanned;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,46 +15,25 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.TimePicker;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.mareu.R;
-import com.example.mareu.di.Di;
-import com.example.mareu.model.Meeting;
+import com.example.mareu.Utils;
+import com.example.mareu.di.DI;
 import com.example.mareu.service.MeetingApiService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
-import org.joda.time.DateTime;
-
-import java.text.DateFormat;
-import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.time.Year;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 import static com.example.mareu.ui.meeting_list.MeetingFragment.BUNDLE_EXTRA_COLOR;
 import static com.example.mareu.ui.meeting_list.MeetingFragment.BUNDLE_EXTRA_DATE;
@@ -80,7 +54,6 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
     private EditText mDateText, mHourText;
     private MaterialButton mSave;
 
-    private MeetingApiService mApiService;
     private int mMeetingColor = 0;
     private int mYear;
     private int mMonth;
@@ -100,7 +73,6 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_meeting);
-        mApiService = Di.getNewInstanceApiService();
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
@@ -170,7 +142,7 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
                 TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        mHourText.setText(mApiService.pad(hourOfDay) + ":" + mApiService.pad(minute));
+                        mHourText.setText(Utils.pad(hourOfDay) + ":" + Utils.pad(minute));
                 }
             }, mHour, mMinute, true);
 
@@ -213,23 +185,6 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-
-                /*if (mApiService.verifyIfIsNotPossible(roomChoosed, dateToCompare)) {
-                    AlertDialog.Builder buildeMeetingError;
-                    buildeMeetingError = new AlertDialog.Builder(this);
-                    buildeMeetingError.setTitle("Error to adding the meeting !");
-                    buildeMeetingError.setMessage("There is already a meeting in this room at this time. Please choose an other room or an other time ");
-                    buildeMeetingError.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
-
-                    AlertDialog dialogMeetingError = buildeMeetingError.create();
-                    dialogMeetingError.show();
-                } else {
-                    saveMeeting(idChoosed);
-                }*/
                 saveMeeting(idChoosed);
                 break;
         }
@@ -269,11 +224,9 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
-
             @Override
             public void afterTextChanged(Editable s) {
                 mSave.setEnabled(s.length() > 0);
@@ -283,14 +236,10 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
         mAddParticipants.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
-
             @Override
             public void afterTextChanged(Editable s) {mButtonAddParticipantsWithMail.setEnabled(s.length() > 2);}
         });

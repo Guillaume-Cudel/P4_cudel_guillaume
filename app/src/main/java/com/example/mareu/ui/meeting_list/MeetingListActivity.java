@@ -46,12 +46,6 @@ public class MeetingListActivity extends AppCompatActivity {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
     }
-
-    /*@OnClick(R.id.add_meeting)
-    void addMeeting() {
-        Intent secondeActivite = new Intent(MeetingListActivity.this, AddMeetingActivity.class);
-        startActivityForResult(secondeActivite, MeetingFragment.REQUEST_MEETING);
-    }*/
 }
 
 

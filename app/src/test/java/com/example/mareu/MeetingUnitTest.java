@@ -1,6 +1,6 @@
 package com.example.mareu;
 
-import com.example.mareu.di.Di;
+import com.example.mareu.di.DI;
 import com.example.mareu.model.Meeting;
 import com.example.mareu.service.DummyMeetingGenerator;
 import com.example.mareu.service.MeetingApiService;
@@ -31,7 +31,7 @@ public class MeetingUnitTest {
 
     @Before
     public void setup() {
-        service = Di.getNewInstanceApiService();
+        service = DI.getNewInstanceApiService();
     }
 
     @Test
@@ -63,21 +63,20 @@ public class MeetingUnitTest {
         assertTrue(service.getMeetings().isEmpty());
     }
 
-    // TODO ajouter test sur méthode de controle de date et salle
-
-
     @Test
     public void verifyIfDatesAndRoomAreGood() throws ParseException {
         // Create dates and rooms
         String room1 = "Room B";
         String room2 = "Room A";
-        String date1 = "01/01/2021 12:00";
-        String date2 = "01/01/2021 12:20";
-        String date3 = "01/01/2021 13:00";
+        String date1 = "01/01/2021 14:00";
+        String date2 = "01/01/2021 14:20";
+        String date3 = "01/01/2021 15:00";
+        String date4 = "01/01/2021 13:30";
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm");
         Date startDate1 = sdf.parse(date1);
         Date startDate2 = sdf.parse(date2);
         Date startDate3 = sdf.parse(date3);
+        Date startDate4 = sdf.parse(date4);
         // Meetings list is empty
         assertTrue(service.getMeetings().isEmpty());
         // Create a meeting
@@ -92,6 +91,8 @@ public class MeetingUnitTest {
         assertTrue(service.verifyIfIsNotPossible(room1, startDate2));
         // Same room and the date is ok
         assertFalse(service.verifyIfIsNotPossible(room1, startDate3));
+        // Same room and date before the meeting
+        assertTrue(service.verifyIfIsNotPossible(room1, startDate4));
         // It's false because there is an other room
         assertFalse(service.verifyIfIsNotPossible(room2, startDate2));
     }

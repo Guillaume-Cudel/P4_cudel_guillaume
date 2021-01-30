@@ -44,18 +44,6 @@ public class DummyMeetingApiService implements MeetingApiService {
     }
 
     @Override
-    public String pad(int input){
-        String str = "";
-        if (input >= 10){
-            str = Integer.toString(input);
-        } else {
-            str = "0" + Integer.toString(input);
-        }
-        return str;
-    }
-
-
-    @Override
     public boolean verifyIfIsNotPossible(String verifyRoom, Date verifyDate) {
         for (Meeting m : meetings) {
             if (m.getLocation().equals(verifyRoom)) {
@@ -76,12 +64,12 @@ public class DummyMeetingApiService implements MeetingApiService {
 
                 if (verifyDate.after(startOldDate) && verifyDate.before(endOldDate)) {
                     return true;
-                } else if (verifyDate.equals(endOldDate) || endNewDate.equals(startOldDate)) {
+                } else if (verifyDate.equals(endOldDate)) {
                     return false;
                 }else if(verifyDate.before(startOldDate) && endNewDate.after(startOldDate)){
                     return true;
                 }else {
-                    return false;
+                    return true;
                 }
             }
         }

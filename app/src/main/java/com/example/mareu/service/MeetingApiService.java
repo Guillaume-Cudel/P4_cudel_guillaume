@@ -15,8 +15,6 @@ public interface MeetingApiService {
 
     List<Meeting> getMeetingsByDateAndRoom(String date, String room);
 
-    String pad(int input);
-
     boolean verifyIfIsNotPossible(String room, Date dateToCompare);
 
 }

@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mareu.R;
-import com.example.mareu.di.Di;
+import com.example.mareu.di.DI;
 import com.example.mareu.events.DeleteMeetingEvent;
 import com.example.mareu.model.Meeting;
 import com.example.mareu.service.MeetingApiService;
@@ -67,7 +67,7 @@ public class MeetingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mApiService = Di.getNewInstanceApiService();
+        mApiService = DI.getNewInstanceApiService();
         setHasOptionsMenu(true);
 
         final Calendar c = Calendar.getInstance();
@@ -211,7 +211,6 @@ public class MeetingFragment extends Fragment {
 
             Meeting meeting = new Meeting(id, color, location, date, hour, subject, participants, dateCompare);
 
-            // AJOUT ----------------
             if (mApiService.verifyIfIsNotPossible(location, dateCompare)) {
                 AlertDialog.Builder buildeMeetingError;
                 buildeMeetingError = new AlertDialog.Builder(requireActivity());
@@ -228,8 +227,6 @@ public class MeetingFragment extends Fragment {
             } else {
                 mApiService.createMeeting(meeting);
             }
-            // FIN AJOUT ------------
-           // mApiService.createMeeting(meeting);
         }
     }
 }
