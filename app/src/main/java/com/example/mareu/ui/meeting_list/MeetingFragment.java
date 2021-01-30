@@ -216,7 +216,7 @@ public class MeetingFragment extends Fragment {
                 AlertDialog.Builder buildeMeetingError;
                 buildeMeetingError = new AlertDialog.Builder(requireActivity());
                 buildeMeetingError.setTitle("Error to adding the meeting !");
-                buildeMeetingError.setMessage("There is already a meeting in this room at this time. Please choose an other room or an other time ");
+                buildeMeetingError.setMessage("There is already a meeting in this room at this time. \n A meeting lasts 1 hour. \nPlease choose an other room or an other time ");
                 buildeMeetingError.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
