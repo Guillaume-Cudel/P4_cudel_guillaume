@@ -126,7 +126,7 @@ public class MeetingFragment extends Fragment {
                                 public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                                     Calendar selectedDate = Calendar.getInstance();
                                     selectedDate.set(year, month, dayOfMonth);
-                                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+                                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
                                     String formatedDate = formatter.format(selectedDate.getTime());
                                     mEditDate.setText(formatedDate);
                                    // mEditDate.setText(dayOfMonth + "-" + month + "-" + year);

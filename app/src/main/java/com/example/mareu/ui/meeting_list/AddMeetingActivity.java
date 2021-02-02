@@ -243,6 +243,7 @@ public class AddMeetingActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void afterTextChanged(Editable s) {mButtonAddParticipantsWithMail.setEnabled(s.length() > 2);}
         });
+
     }
 
     public void changeColor(int color) {
