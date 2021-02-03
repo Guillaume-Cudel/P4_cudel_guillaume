@@ -68,13 +68,11 @@ public class DummyMeetingApiService implements MeetingApiService {
                     return false;
                 }else if(verifyDate.before(startOldDate) && endNewDate.after(startOldDate)){
                     return true;
-                }else {
-                    return false;
                 }
             }
         }
             return false;
-        }
+    }
 
 }
 
